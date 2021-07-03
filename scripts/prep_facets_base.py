@@ -3,7 +3,7 @@ of preprocessing."""
 import pandas as pd
 
 # Define paths
-data_path = '../data/clean_qualtrics_irt_rollout.feather'
+data_path = "../data/clean_qualtrics_irt_rollout.feather"
 facets_input_path = "facets_data.txt"
 facets_spec_path = "facets_spec.txt"
 score_path = "facets_scores"
@@ -19,7 +19,6 @@ comment_col = 'comment_id'
 labeler_col = 'labeler_id'
 items = ["sentiment", "respect", "insult", "humiliate", "status",
          "dehumanize", "violence", "genocide", "attack_defend", "hatespeech"]
-
 
 # Read in hate speech data
 data = pd.read_feather(data_path).rename(columns={'violence_phys': 'violence'})
