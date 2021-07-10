@@ -4,7 +4,7 @@ Experiment 01: Minimal preprocessing, split up data according to the target
 identity of the comment: either black or white."""
 import pandas as pd
 
-from hatespeech.utils import race_to_col, items
+from hatespeech.keys import race_to_col, items
 
 # Define paths
 data_path = "../data/clean_qualtrics_irt_rollout.feather"
