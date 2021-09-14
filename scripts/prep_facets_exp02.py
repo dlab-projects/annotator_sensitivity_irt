@@ -1,22 +1,20 @@
 """Creates Facets specification from hate speech data.
 
-Experiment 01: Minimal preprocessing, split up data according to the target
-identity of the comment: either men or women."""
+Experiment 02: Remove non-quality raters, split up data according to the target
+identity of the comment: either black or white."""
 import pandas as pd
 
-from hatespeech.keys import gender_to_col, items
+from hatespeech import utils
+from hatespeech.keys import race_to_col, items
 
 # Define paths
-data_path = "../data/clean_qualtrics_irt_rollout.feather"
-
-# Experiment settings
-tag = 'exp02'
-groups = ['men', 'women']
-
+exp = "02"
+data_path = "~/data/clean_qualtrics_irt_rollout.feather"
+rater_quality_path = "~/data/rater_quality_check.csv"
+groups = ["white", "black"]
 # Column names
 comment_col = 'comment_id'
 labeler_col = 'labeler_id'
-
 # Facets specification file inputs
 title = "Facets Rollout Scaling"
 model = "?, ?, #, R"
@@ -25,19 +23,23 @@ noncenter = "1"
 # Read in hate speech data
 data = pd.read_feather(data_path).rename(columns={'violence_phys': 'violence'})
 # Remove all rows in which some item is missing
-data = data[~data[items].isna().any(axis=1)].astype({item: 'int64' for item in items})
+data = utils.filter_missing_items(data)
+# Remove all rows in which the rater is not up to sufficient quality
+rater_quality = pd.read_csv(rater_quality_path)
+data = utils.filter_annotator_quality(data, rater_quality)
+
 # Item ID will support Facets spec
 data['item_id'] = f'1-{len(items)}'
 
 # Iterate over each racial group
 for group in groups:
-    data_path = f"{tag}_data_{group}.txt"
-    spec_path = f"{tag}_spec_{group}.txt"
-    scores_path = f"{tag}_scores_{group}"
-    output_path = f"{tag}_out_{group}.txt"
+    data_path = f"exp{exp}_data_{group}.txt"
+    spec_path = f"exp{exp}_spec_{group}.txt"
+    scores_path = f"exp{exp}_scores_{group}"
+    output_path = f"exp{exp}_out_{group}.txt"
 
     # Separate into black and white targeting comments
-    subset = data[data[gender_to_col[group]] == 1]
+    subset = data[data[race_to_col[group]] == 1]
     # Generate Facets input
     facets = subset[[comment_col, labeler_col, "item_id"] + items]
     facets.to_csv(data_path, sep=',', header=False, index=False)

@@ -7,7 +7,8 @@ import pandas as pd
 from hatespeech.keys import race_to_col, items
 
 # Define paths
-data_path = "../data/clean_qualtrics_irt_rollout.feather"
+exp = "01"
+data_path = "~/data/clean_qualtrics_irt_rollout.feather"
 groups = ["white", "black"]
 
 # Column names
@@ -28,10 +29,10 @@ data['item_id'] = f'1-{len(items)}'
 
 # Iterate over each racial group
 for group in groups:
-    data_path = f"exp01_data_{group}.txt"
-    spec_path = f"exp01_spec_{group}.txt"
-    scores_path = f"exp01_scores_{group}"
-    output_path = f"exp01_out_{group}.txt"
+    data_path = f"exp{exp}_data_{group}.txt"
+    spec_path = f"exp{exp}_spec_{group}.txt"
+    scores_path = f"exp{exp}_scores_{group}"
+    output_path = f"exp{exp}_out_{group}.txt"
 
     # Separate into black and white targeting comments
     subset = data[data[race_to_col[group]] == 1]
