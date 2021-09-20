@@ -1,4 +1,4 @@
-from hatespeech.keys import items as item_names
+from hatespeech.keys import items as item_names, race_to_col
 
 
 def filter_missing_items(data):
@@ -71,3 +71,24 @@ def recode_responses(
                          [sentiment, respect, insult, humiliate, status,
                           dehumanize, violence, genocide, attack_defend, hatespeech]))
     return data.replace(items)
+
+
+def filter_comments_targeting_bw(data, threshold=0.5):
+    proportions = data.fillna(
+        {race_to_col['black']: 0,
+         race_to_col['white']: 0}
+    ).groupby(
+        'comment_id'
+    ).agg(
+        {race_to_col['black']: 'mean',
+         race_to_col['white']: 'mean'})
+    # Get comments satisfying threshold
+    valid_comments = proportions[
+        (proportions[race_to_col['black']] > threshold)
+        | (proportions[race_to_col['white']] > threshold)
+    ]
+    valid_ids = valid_comments.index.values
+    valid_labels = valid_comments[race_to_col['black']] > 1
+    filtered = data[data['comment_id'].isin(valid_ids)].copy()
+    filtered['target_black'] = valid_labels.astype('int')
+    return filtered
