@@ -74,6 +74,16 @@ def recode_responses(
 
 
 def filter_comments_targeting_bw(data, threshold=0.5):
+    """Filter out comments not targeting on the basis on black/white identity.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Hate speech dataset.
+    threshold : float
+        The fraction of annotators that have to agree on the target identity.
+    """
+    # Determine which annotators agree on target identity
     proportions = data.fillna(
         {race_to_col['black']: 0,
          race_to_col['white']: 0}
@@ -81,14 +91,20 @@ def filter_comments_targeting_bw(data, threshold=0.5):
         'comment_id'
     ).agg(
         {race_to_col['black']: 'mean',
-         race_to_col['white']: 'mean'})
+         race_to_col['white']: 'mean'}
+    ).rename(
+        {race_to_col['black']: 'target_black',
+         race_to_col['white']: 'target_white'},
+        axis=1
+    ).reset_index()
     # Get comments satisfying threshold
     valid_comments = proportions[
-        (proportions[race_to_col['black']] > threshold)
-        | (proportions[race_to_col['white']] > threshold)
+        (proportions['target_black'] > threshold)
+        | (proportions['target_white'] > threshold)
     ]
-    valid_ids = valid_comments.index.values
-    valid_labels = valid_comments[race_to_col['black']] > 1
-    filtered = data[data['comment_id'].isin(valid_ids)].copy()
-    filtered['target_black'] = valid_labels.astype('int')
+    valid_ids = valid_comments['comment_id']
+    filtered = data[data['comment_id'].isin(valid_ids)].copy().merge(
+        valid_comments[['comment_id', 'target_black']],
+        on='comment_id')
+    filtered['target_black'] = filtered['target_black'] >= 0.5
     return filtered
