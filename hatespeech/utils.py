@@ -108,3 +108,11 @@ def filter_comments_targeting_bw(data, threshold=0.5):
         on='comment_id')
     filtered['target_black'] = filtered['target_black'] >= 0.5
     return filtered
+
+
+def filter_comments_by_count(data, threshold=50, comment_id_col='comment_id'):
+    """Filters comments in the reference set, defined as those that """
+    n_labelers = data[comment_id_col].value_counts()
+    reference_ids = n_labelers[n_labelers > threshold].index
+    reference_set = data[data[comment_id_col].isin(reference_ids)].copy()
+    return reference_set
