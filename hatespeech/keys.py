@@ -57,6 +57,7 @@ gender_to_col = swap_key_val(col_to_gender)
 Annotator columns
 """
 # Annotator gender
+annotator_gender_col = 'demo_gender'
 annotator_gender = {
     'female': 1.0,
     'male': 2.0,
