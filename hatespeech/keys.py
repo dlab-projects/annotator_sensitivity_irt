@@ -90,8 +90,8 @@ col_to_annotator_race = {
     'demo_race_ethnicitie_4': 'latinx',
     'demo_race_ethnicitie_5': 'pacific_islander',
     'demo_race_ethnicitie_6': 'white',
-    'demo_race_ethnicitie_7': 'other race',
-    'demo_race_ethnicitie_8': 'middle eastern'}
+    'demo_race_ethnicitie_7': 'other_race',
+    'demo_race_ethnicitie_8': 'middle_eastern'}
 annotator_race_to_col = swap_key_val(col_to_annotator_race)
 
 # Annotator age
