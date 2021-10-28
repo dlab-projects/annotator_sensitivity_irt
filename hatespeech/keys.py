@@ -43,6 +43,40 @@ col_to_race = {
     'target_race_7': 'other_race'}
 race_to_col = swap_key_val(col_to_race)
 
+# For transformed data
+target_race_cols = [
+    'target_race_asian',
+    'target_race_black',
+    'target_race_latinx',
+    'target_race_middle_eastern',
+    'target_race_native_american',
+    'target_race_pacific_islander',
+    'target_race_white',
+    'target_race_other'
+]
+
+# Target identity religion column
+col_to_religion = {
+    'target_religion_1': 'jewish',
+    'target_religion_2': 'christian',
+    'target_religion_4': 'buddhist',
+    'target_religion_5': 'hindu',
+    'target_religion_6': 'other',
+    'target_religion_8': 'mormon',
+    'target_religion_9': 'atheist',
+    'target_religion_10': 'muslim'}
+religion_to_col = swap_key_val(col_to_religion)
+
+# Target identity citizenship column
+col_to_origin = {
+    'target_citizen_1': 'immigrant',
+    'target_citizen_2': 'migrant_worker',
+    'target_citizen_3': 'undocumented',
+    'target_citizen_4': 'other',
+    'target_citizen_5': 'specific_country'}
+origin_to_col = swap_key_val(col_to_origin)
+
+# Target identity gender column
 col_to_gender = {
     'target_gender_1': 'men',
     'target_gender_2': 'non-binary',
@@ -52,6 +86,38 @@ col_to_gender = {
     'target_gender_6': 'transgender_men',
     'target_gender_7': 'transgender_unspecified'}
 gender_to_col = swap_key_val(col_to_gender)
+
+# Target identity sexuality column
+col_to_sexuality = {
+    'target_sexuality_1': 'bisexual',
+    'target_sexuality_2': 'gay',
+    'target_sexuality_3': 'lesbian',
+    'target_sexuality_6': 'straight',
+    'target_sexuality_5': 'other'}
+sexuality_to_col = swap_key_val(col_to_sexuality)
+
+# Target identity age column
+col_to_age = {
+    'target_age_1': 'children',
+    'target_age_2': 'teenagers',
+    'target_age_3': 'young_adults',
+    'target_age_4': 'middle_aged',
+    'target_age_5': 'seniors',
+    'target_age_6': 'other'
+}
+age_to_col = swap_key_val(col_to_age)
+
+# Target identity disability column
+col_to_disability = {
+    'target_disability_1': 'physical',
+    'target_disability_2': 'cognitive',
+    'target_disability_3': 'neurological',
+    'target_disability_4': 'visually_impaired',
+    'target_disability_5': 'hearing_impaired',
+    'target_disability_6': 'other',
+    'target_disability_9': 'unspecific'
+}
+disability_to_col = swap_key_val(col_to_disability)
 
 """
 Annotator columns
