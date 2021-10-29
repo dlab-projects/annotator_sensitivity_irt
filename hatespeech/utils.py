@@ -1,4 +1,4 @@
-from hatespeech.keys import items as item_names, race_to_col, gender_to_col
+from hatespeech.keys import items as item_names, target_race_to_col, target_gender_to_col
 
 
 def filter_missing_items(data):
@@ -85,16 +85,16 @@ def filter_comments_targeting_bw(data, threshold=0.5):
     """
     # Determine which annotators agree on target identity
     proportions = data.fillna(
-        {race_to_col['black']: 0,
-         race_to_col['white']: 0}
+        {target_race_to_col['black']: 0,
+         target_race_to_col['white']: 0}
     ).groupby(
         'comment_id'
     ).agg(
-        {race_to_col['black']: 'mean',
-         race_to_col['white']: 'mean'}
+        {target_race_to_col['black']: 'mean',
+         target_race_to_col['white']: 'mean'}
     ).rename(
-        {race_to_col['black']: 'target_black',
-         race_to_col['white']: 'target_white'},
+        {target_race_to_col['black']: 'target_black',
+         target_race_to_col['white']: 'target_white'},
         axis=1
     ).reset_index()
     # Get comments satisfying threshold
@@ -122,16 +122,16 @@ def filter_comments_targeting_mw(data, threshold=0.5):
     """
     # Determine which annotators agree on target identity
     proportions = data.fillna(
-        {gender_to_col['men']: 0,
-         gender_to_col['women']: 0}
+        {target_gender_to_col['men']: 0,
+         target_gender_to_col['women']: 0}
     ).groupby(
         'comment_id'
     ).agg(
-        {gender_to_col['men']: 'mean',
-         gender_to_col['women']: 'mean'}
+        {target_gender_to_col['men']: 'mean',
+         target_gender_to_col['women']: 'mean'}
     ).rename(
-        {gender_to_col['men']: 'target_men',
-         gender_to_col['women']: 'target_women'},
+        {target_gender_to_col['men']: 'target_men',
+         target_gender_to_col['women']: 'target_women'},
         axis=1
     ).reset_index()
     # Get comments satisfying threshold
