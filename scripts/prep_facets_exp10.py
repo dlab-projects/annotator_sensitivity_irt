@@ -15,7 +15,7 @@ from hatespeech import keys, utils
 
 # Define paths
 exp = "10"
-data_path = "~/data/hatespeech/unfiltered_ratings.csv"
+data_path = "~/data/hatespeech/unfiltered_ratings.feather"
 rater_quality_path = "~/data/hatespeech/rater_quality_check.csv"
 groups = ["white", "black"]
 # Column names
