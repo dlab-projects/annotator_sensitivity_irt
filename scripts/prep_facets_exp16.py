@@ -1,7 +1,7 @@
 """Runs Facets Scaling Experiment 10.
 
-Experiment 15:
-    - Separate calibration on women vs. men
+Experiment 16:
+    - Separate calibration on straight vs. queer
     - Use the streamlined dataset
     - Filter out missing ratings
     - Filter out by rater quality
@@ -15,10 +15,10 @@ import pandas as pd
 from hatespeech import keys, utils
 
 # Define paths
-exp = "15"
+exp = "16"
 data_path = "~/data/hatespeech/unfiltered_ratings.feather"
 rater_quality_path = "~/data/hatespeech/rater_quality_check.csv"
-groups = ["men", "women"]
+groups = ["straight", "queer"]
 # Column names
 comment_col = 'comment_id'
 labeler_col = 'labeler_id'
@@ -42,7 +42,11 @@ data = utils.recode_responses(
     attack_defend={1: 0, 2: 1, 3: 2, 4: 3},
     hatespeech={1: 0, 2: 1})
 # Only get comments targeting on the basis of male or female identity
-data = data[data['target_gender_men'] | data['target_gender_women']]
+data['target_sexuality_queer'] = data[['target_sexuality_bisexual',
+                                       'target_sexuality_gay',
+                                       'target_sexuality_lesbian',
+                                       'target_sexuality_other']].any(axis=1)
+data = data[data['target_sexuality_straight'] | data['target_sexuality_queer']]
 
 # Item ID will support Facets spec
 data['item_id'] = f'1-{len(keys.items)}'
@@ -55,7 +59,7 @@ for group in groups:
     output_path = f"exp{exp}_out_{group}.txt"
 
     # Separate into male and female targeting comments
-    subset = data[data[f'target_gender_{group}'] == 1]
+    subset = data[data[f'target_sexuality_{group}'] == 1]
     # Generate Facets input
     facets = subset[[comment_col, labeler_col, "item_id"] + keys.items]
     facets.to_csv(data_path, sep=',', header=False, index=False)

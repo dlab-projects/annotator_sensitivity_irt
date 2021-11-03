@@ -1,7 +1,7 @@
 """Runs Facets Scaling Experiment 10.
 
-Experiment 15:
-    - Separate calibration on women vs. men
+Experiment 17:
+    - Separate calibration on political left vs. right
     - Use the streamlined dataset
     - Filter out missing ratings
     - Filter out by rater quality
@@ -15,10 +15,10 @@ import pandas as pd
 from hatespeech import keys, utils
 
 # Define paths
-exp = "15"
+exp = "17"
 data_path = "~/data/hatespeech/unfiltered_ratings.feather"
 rater_quality_path = "~/data/hatespeech/rater_quality_check.csv"
-groups = ["men", "women"]
+groups = ["left", "right"]
 # Column names
 comment_col = 'comment_id'
 labeler_col = 'labeler_id'
@@ -41,8 +41,18 @@ data = utils.recode_responses(
     genocide={1: 0, 2: 0, 3: 1, 4: 1},
     attack_defend={1: 0, 2: 1, 3: 2, 4: 3},
     hatespeech={1: 0, 2: 1})
-# Only get comments targeting on the basis of male or female identity
-data = data[data['target_gender_men'] | data['target_gender_women']]
+# Only get comments targeting on the basis of political left or right identity
+data['target_politics_left'] = data[['target_politics_communist',
+                                     'target_politics_democrat',
+                                     'target_politics_green_party',
+                                     'target_politics_leftist',
+                                     'target_politics_liberal',
+                                     'target_politics_socialist']].any(axis=1)
+data['target_politics_right'] = data[['target_politics_alt_right',
+                                      'target_politics_conservative',
+                                      'target_politics_libertarian',
+                                      'target_politics_republican']].any(axis=1)
+data = data[data['target_politics_left'] | data['target_politics_right']]
 
 # Item ID will support Facets spec
 data['item_id'] = f'1-{len(keys.items)}'
@@ -55,7 +65,7 @@ for group in groups:
     output_path = f"exp{exp}_out_{group}.txt"
 
     # Separate into male and female targeting comments
-    subset = data[data[f'target_gender_{group}'] == 1]
+    subset = data[data[f'target_politics_{group}'] == 1]
     # Generate Facets input
     facets = subset[[comment_col, labeler_col, "item_id"] + keys.items]
     facets.to_csv(data_path, sep=',', header=False, index=False)
