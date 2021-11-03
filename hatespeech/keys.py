@@ -295,6 +295,17 @@ annotator_col_to_religion = {
     'demo_religion_10': 'other',
     'demo_religion_11': 'christian'}
 annotator_religion_to_col = swap_key_val(annotator_col_to_religion)
+# For transformed data
+annotator_religion_cols = [
+    'annotator_religion_atheist',
+    'annotator_religion_buddhist',
+    'annotator_religion_christian',
+    'annotator_religion_hindu',
+    'annotator_religion_jewish',
+    'annotator_religion_mormon',
+    'annotator_religion_muslim',
+    'annotator_religion_other',
+]
 
 # Annotator sexual orientation
 annotator_col_to_sexual_orientation = {
@@ -304,6 +315,13 @@ annotator_col_to_sexual_orientation = {
     'demo_sexual_orien_4': 'other',
     'demo_sexual_orien_5': 'prefer_not_to_say'}
 annotator_sexual_orientation_to_col = swap_key_val(annotator_col_to_sexual_orientation)
+# For transformed data
+annotator_sexuality_cols = [
+    'annotator_sexuality_bisexual',
+    'annotator_sexuality_gay',
+    'annotator_sexuality_straight',
+    'annotator_sexuality_other',
+]
 
 # Annotator ideology
 annotator_ideology_col = 'demo_ideology'
