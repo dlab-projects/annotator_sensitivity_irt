@@ -1,4 +1,78 @@
+import numpy as np
+
 from hatespeech.keys import items as item_names, target_race_to_col, target_gender_to_col
+
+
+def get_annotator_subsets(data, subsets):
+    """Subset the hate speech data by different annotator identity groups.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Hate speech dataset.
+    subsets : list of lists, or list of strings
+        A list containing each identity group subset. Each entry of the list is
+        either a string, denoting a single identity in the subset, or a list of
+        strings, denoting a group of identities.
+
+    Returns
+    -------
+    annotators : list of np.ndarrays
+        A list containing the labeler IDs of each annotator within the provided
+        subsets.
+    """
+    annotators_temp = []
+    # Iterate over the subsets, matching annotators
+    for idx, subset in enumerate(subsets):
+        # Turn subset into list if it is a string
+        if isinstance(subset, str):
+            subsets[idx] = [subset]
+        # Get the unique annotators matching to the subset
+        annotators_temp.append(np.unique(data[data[subsets[idx]].any(axis=1)]['labeler_id'].values))
+
+    # Remove annotators that are common amongst groups
+    annotators = []
+    for idx, annotator in enumerate(annotators_temp):
+        # Concatenate remaining groups
+        remaining = np.concatenate(annotators_temp[:idx] + annotators_temp[idx+1:])
+        # Remove shared annotators
+        annotators.append(np.setdiff1d(annotator, remaining))
+    return annotators
+
+
+def get_annotator_diffs(data, target1, target2, subsets):
+    """Calculate the annotator severity differences between two target groups,
+    across annotator subsets.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Hate speech dataset.
+    target1, target2 : pd.DataFrame
+        The Facets dataframe corresponding to each annotators' severity on
+        the Facets run targeting identity group 1 (target1) or identity group
+        2 (target2).
+    subsets : list of lists, or list of strings
+        A list containing each identity group subset. Each entry of the list is
+        either a string, denoting a single identity in the subset, or a list of
+        strings, denoting a group of identities.
+
+    Returns
+    -------
+    diffs : list of np.ndarrays
+        A list containing the severity differences for each annotator group
+        provided in subsets.
+    """
+    diffs = []
+    # Obtain annotator subsets
+    annotators = get_annotator_subsets(data, subsets)
+    # Iterate over the annotator groups
+    for idx, annotator in enumerate(annotators):
+        target1_sevs = target1[target1['Judges'].isin(annotator)]['Measure'].values
+        target2_sevs = target2[target2['Judges'].isin(annotator)]['Measure'].values
+        diffs.append(target1_sevs - target2_sevs)
+
+    return diffs
 
 
 def filter_missing_items(data):
