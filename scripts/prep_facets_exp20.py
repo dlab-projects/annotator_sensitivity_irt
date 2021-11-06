@@ -1,6 +1,6 @@
-"""Runs Facets Scaling Experiment 19.
+"""Runs Facets Scaling Experiment 20.
 
-Experiment 19:
+Experiment 20:
     - Annotator/target facet interaction term.
     - Use the streamlined dataset
     - Filter out missing ratings
@@ -16,7 +16,7 @@ import pandas as pd
 from hatespeech import keys, utils
 
 # Define paths
-exp = "19"
+exp = "20"
 data_path = "~/data/hatespeech/unfiltered_ratings.feather"
 rater_quality_path = "~/data/hatespeech/rater_quality_check.csv"
 # Column names
