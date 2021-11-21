@@ -147,6 +147,42 @@ def recode_responses(
     return data.replace(items)
 
 
+def filter_annotator_identity(data, annotators, omit_multiracial=True):
+    """Filter the dataset according to annotator identity.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The hate speech dataset.
+    annotators : list of strings
+        The annotator identities to filter by. This list should contain the
+        column names.
+    omit_multiracial : bool
+        If True, removes annotators that identify as one or more of the
+        provided columns.
+
+    Returns
+    -------
+    subset : pd.DataFrame
+        A subset of the original dataframe containing only comments annotated
+        by annotators in the identity group.
+    """
+    subset = data[data[annotators].any(axis=1)]
+    if omit_multiracial:
+        subset = subset[subset[annotators].sum(axis=1) == 1]
+    return subset.copy()
+
+
+def filter_target_identity(data, targets, threshold=None):
+    subset = data[data[targets].any(axis=1)]
+    proportions = subset.groupby(
+        'comment_id'
+        ).agg(
+            {target: 'mean' for target in targets}
+        ).reset_index()
+    valid_comments = proportions[proportions[targets].ge(threshold).any(axis=1)]
+
+
 def filter_comments_targeting_bw(data, threshold=0.5):
     """Filter out comments not targeting on the basis on black/white identity.
 
