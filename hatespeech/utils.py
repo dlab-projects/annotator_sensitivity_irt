@@ -173,14 +173,29 @@ def filter_annotator_identity(data, annotators, omit_multiracial=True):
     return subset.copy()
 
 
-def filter_target_identity(data, targets, threshold=None):
+def get_annotator_agreement(data, targets):
     subset = data[data[targets].any(axis=1)]
     proportions = subset.groupby(
         'comment_id'
         ).agg(
             {target: 'mean' for target in targets}
         ).reset_index()
-    valid_comments = proportions[proportions[targets].ge(threshold).any(axis=1)]
+    return proportions
+
+
+def get_comments_w_agreement(data, targets, threshold):
+    proportions = get_annotator_agreement(data, targets)
+    agreed_comments = proportions[proportions[targets].ge(threshold).any(axis=1)]
+    agreed_comments = agreed_comments[~agreed_comments[targets].ge(threshold).all(axis=1)]
+    # Threshold the agreement fraction
+    thresholded_comments = agreed_comments.copy()
+    thresholded_comments[targets] = thresholded_comments[targets].ge(threshold)
+    samples_w_agreement = data.merge(thresholded_comments,
+                                     how='right',
+                                     on='comment_id',
+                                     suffixes=('', '_agreed'))
+    
+    return agreed_comments, samples_w_agreement
 
 
 def filter_comments_targeting_bw(data, threshold=0.5):
