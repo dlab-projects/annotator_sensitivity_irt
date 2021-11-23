@@ -173,7 +173,22 @@ def filter_annotator_identity(data, annotators, omit_multiracial=True):
     return subset.copy()
 
 
-def get_annotator_agreement(data, targets):
+def get_annotator_agreement_on_target(data, targets):
+    """Calculates the fraction of annotators that agree on the target identity.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The hate speech dataset.
+    targets : list
+        The target identities.
+
+    Returns
+    -------
+    proportions : pd.DataFrame
+        A dataframe of the hate speech comments, with the proportion of
+        annotators agreeing for each target label.
+    """
     subset = data[data[targets].any(axis=1)]
     proportions = subset.groupby(
         'comment_id'
@@ -183,17 +198,46 @@ def get_annotator_agreement(data, targets):
     return proportions
 
 
-def get_comments_w_agreement(data, targets, threshold):
-    proportions = get_annotator_agreement(data, targets)
+def get_comments_w_agreement_on_target(
+    data, targets, threshold, remove_multi_target=True, suffix='_agreed'
+):
+    """Obtains the comments satisfying an agreement threshold.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The hate speech dataset.
+    targets : list
+        The target identities.
+    threshold : float
+        The fraction of annotators which must agree on the target to include.
+    remove_multi_target : bool
+        If True, removes comments in which annotators agree on multiple
+        targets.
+    suffix : string
+        The suffix for the target label indicating what annotators agreed on.
+
+    Returns
+    -------
+    agreed_comments : pd.DataFrame
+        The comments in which annotators achieved sufficient agreement.
+    samples_w_agreement : pd.DataFrame
+        All annotations for all comments identified as satisfying agreement.
+    """
+    # Obtain annotator agreement proportions
+    proportions = get_annotator_agreement_on_target(data, targets)
+    # Identify comments with sufficient agreement
     agreed_comments = proportions[proportions[targets].ge(threshold).any(axis=1)]
-    agreed_comments = agreed_comments[~agreed_comments[targets].ge(threshold).all(axis=1)]
+    if remove_multi_target:
+        agreed_comments = agreed_comments[~agreed_comments[targets].ge(threshold).all(axis=1)]
     # Threshold the agreement fraction
     thresholded_comments = agreed_comments.copy()
     thresholded_comments[targets] = thresholded_comments[targets].ge(threshold)
+    # Merge the label back into the original samples
     samples_w_agreement = data.merge(thresholded_comments,
                                      how='right',
                                      on='comment_id',
-                                     suffixes=('', '_agreed'))
+                                     suffixes=('', suffix))
     
     return agreed_comments, samples_w_agreement
 
