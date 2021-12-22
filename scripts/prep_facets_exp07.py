@@ -1,17 +1,17 @@
 """Creates Facets specification from hate speech data.
 
-Experiment 02: Remove non-quality raters, split up data according to the target
-identity of the comment: either black or white."""
+Experiment 03: Remove non-quality raters, recode responses, and split up data
+according to the target identity of the comment: either black or white."""
 import pandas as pd
 
 from hatespeech import utils
-from hatespeech.keys import race_to_col, items
+from hatespeech.keys import gender_to_col, items
 
 # Define paths
-exp = "02"
-data_path = "~/data/clean_qualtrics_irt_rollout.feather"
-rater_quality_path = "~/data/rater_quality_check.csv"
-groups = ["white", "black"]
+exp = "07"
+data_path = "~/data/hatespeech/clean_qualtrics_irt_rollout.feather"
+rater_quality_path = "~/data/hatespeech/rater_quality_check.csv"
+groups = ["men", "women"]
 # Column names
 comment_col = 'comment_id'
 labeler_col = 'labeler_id'
@@ -27,6 +27,17 @@ data = utils.filter_missing_items(data)
 # Remove all rows in which the rater is not up to sufficient quality
 rater_quality = pd.read_csv(rater_quality_path)
 data = utils.filter_annotator_quality(data, rater_quality)
+# Recode item responses
+data = utils.recode_responses(
+    data,
+    insult={1: 0, 2: 1, 3: 2, 4: 3},
+    humiliate={1: 0, 2: 0, 3: 1, 4: 2},
+    status={1: 0, 2: 0, 3: 1, 4: 1},
+    dehumanize={1: 0, 2: 0, 3: 1, 4: 1},
+    violence={1: 0, 2: 0, 3: 1, 4: 1},
+    genocide={1: 0, 2: 0, 3: 1, 4: 1},
+    attack_defend={1: 0, 2: 1, 3: 2, 4: 3},
+    hatespeech={1: 0, 2: 1})
 
 # Item ID will support Facets spec
 data['item_id'] = f'1-{len(items)}'
@@ -39,7 +50,7 @@ for group in groups:
     output_path = f"exp{exp}_out_{group}.txt"
 
     # Separate into black and white targeting comments
-    subset = data[data[race_to_col[group]] == 1]
+    subset = data[data[gender_to_col[group]] == 1]
     # Generate Facets input
     facets = subset[[comment_col, labeler_col, "item_id"] + items]
     facets.to_csv(data_path, sep=',', header=False, index=False)
